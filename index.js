@@ -197,7 +197,7 @@ createTaskBlock.addEventListener('submit', (event) => {
     event.preventDefault()
 
     const errorBlock = document.createElement('span')
-    errorBlock.className = 'error-message-block'
+    errorBlock.className = 'error-message-block create-task-block'
     text = target.taskName.value
 
     let res = null
