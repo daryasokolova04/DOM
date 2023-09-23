@@ -1,26 +1,4 @@
-const tasks = [
-    {
-        id: '1138465078061',
-        completed: false,
-        text: 'Посмотреть новый урок по JS',
-    },
-    {
-        id: '1138465078062',
-        completed: false,
-        text: 'Выполнить тест',
-    },
-    {
-        id: '1138465078063',
-        completed: false,
-        text: 'Выполнить дз',
-    },
-]
-
-
-let darkMode = false
-
 const changeColor = (darkMode) => {   
-    const body = document.querySelector('body')
     const taskItems = document.querySelectorAll('.task-item')
     const buttons = document.querySelectorAll('button')
     const input = document.querySelector('input')
@@ -49,31 +27,6 @@ const changeColor = (darkMode) => {
     }
 }
 
-const postedTasks = []
-prevTasks = document.querySelectorAll('.task-item')
-prevTasks.forEach((task) => {
-    const id = task.dataset.taskId
-    const text = task.querySelector('.task-item__text').textContent
-    task = {
-        id: id,
-        text: text,
-        completed: false
-    }
-    tasks.push(task)
-    postedTasks.push(task)
-    
-})
-
-const tasksList = document.createElement('div')
-tasksList.className = 'tasks-list'
-
-const taskItems = document.querySelectorAll('.task-item')
-taskItems.forEach((item) => {
-    tasksList.append(item)
-})
-
-const body = document.querySelector('body')
-
 const createTask = (task) => {
     const newTask = document.createElement('div')
     newTask.className = 'task-item'
@@ -99,6 +52,10 @@ const createTask = (task) => {
     button.dataset.deleteTaskId = task.id
     button.textContent = 'удалить'
 
+    button.addEventListener('click', () => {
+        createDeleteModal(button)
+    })
+
     const form = document.createElement('form')
     form.className = 'checkbox-form'
     form.append(input, label)
@@ -107,10 +64,114 @@ const createTask = (task) => {
     newTask.append(container)
     tasksList.append(newTask)
     changeColor(darkMode)
-
 }
 
-document.body.prepend(tasksList)
+const createDeleteModal = (button) => {
+    const modal = document.createElement('div')
+    modal.className = 'modal-overlay'
+
+    const deleteModal = document.createElement('div')
+    deleteModal.className = 'delete-modal'
+
+    const deleteModalQuestion = document.createElement('h3')
+    deleteModalQuestion.className = 'delete-modal__question popup'
+
+    deleteModalQuestion.textContent = 'Вы действительно хотите удалить эту задачу?'
+
+    const deleteModalButtons = document.createElement('div')
+    deleteModal.className = 'delete-modal__buttons'
+    const cancelButton = document.createElement('button')
+    cancelButton.className = 'delete-modal__button delete-modal__cancel-button'
+    cancelButton.textContent = 'Отмена'
+
+    const confirmButton = document.createElement('button')
+    confirmButton.className = 'delete-modal__confirm-button delete-modal__button'
+    confirmButton.textContent = 'Удалить'
+
+    deleteModalButtons.append(cancelButton, confirmButton)
+    deleteModal.append(deleteModalQuestion, deleteModalButtons)
+    modal.append(deleteModal)
+    document.body.append(modal)
+    modal.classList.remove('modal-overlay_hidden')
+
+    cancelButton.addEventListener('click', () => {
+        modal.classList.add('modal-overlay_hidden')
+    })
+
+    confirmButton.addEventListener('click', () => {
+        const taskToDelete = document.querySelector(`[data-task-id="${button.dataset.deleteTaskId}"]`)
+        taskToDelete.remove()
+        modal.classList.add('modal-overlay_hidden')
+        let index = null
+        if (tasks) {
+            index = tasks.findIndex((obj) => {
+                return obj.id === button.dataset.deleteTaskId
+            })
+        }
+        if (index)  {
+        tasks.splice(index, 1)
+        }
+    })
+}
+
+
+const tasks = [
+    {
+        id: '1138465078061',
+        completed: false,
+        text: 'Посмотреть новый урок по JS',
+    },
+    {
+        id: '1138465078062',
+        completed: false,
+        text: 'Выполнить тест',
+    },
+    {
+        id: '1138465078063',
+        completed: false,
+        text: 'Выполнить дз',
+    },
+]
+
+
+let darkMode = false
+const body = document.querySelector('body')
+
+const tasksList = document.createElement('div')
+tasksList.className = 'tasks-list'
+
+const postedTasks = []
+document.querySelectorAll('.task-item').forEach((task) => {
+    const id = task.dataset.taskId
+    const text = task.querySelector('.task-item__text').textContent
+    task = {
+        id: id,
+        text: text,
+        completed: false
+    }
+    tasks.push(task)
+    postedTasks.push(task)
+})
+
+document.addEventListener('keydown', (event) => {
+    if (event.key === 'Tab') {
+        darkMode = !darkMode
+        changeColor(darkMode)
+    }
+})
+
+document.querySelectorAll('.task-item__delete-button').forEach((deleteButton) => {
+    deleteButton.addEventListener('click', () => {
+        createDeleteModal(deleteButton)
+    })
+})
+
+
+document.querySelectorAll('.task-item').forEach((item) => {
+    tasksList.append(item)
+})
+body.prepend(tasksList)
+
 
 const createTaskBlock = document.createElement('form')
 createTaskBlock.className = 'create-task-block'
@@ -139,9 +200,13 @@ createTaskBlock.addEventListener('submit', (event) => {
     errorBlock.className = 'error-message-block'
     text = target.taskName.value
 
-    const res = tasks.find((task) => {
-        return task.text === text
-    })
+    let res = null
+    if (tasks) {
+        res = tasks.find((task) => {
+            return task.text === text
+        }) 
+    }
+
     if (res) {
         errorBlock.textContent = 'Задача с таким названием уже существует'
         createTaskBlock.append(errorBlock)
@@ -155,10 +220,8 @@ createTaskBlock.addEventListener('submit', (event) => {
         newTask.completed = false
         tasks.push(newTask)
         createTask(newTask)
-
     }
 })
-
 
 tasks.forEach((task) => {
     if (!postedTasks.includes(task)) {
@@ -166,64 +229,6 @@ tasks.forEach((task) => {
     }
 })
 
-const createDeleteModal = (button) => {
-    const modal = document.createElement('div')
-        modal.className = 'modal-overlay'
-
-        const deleteModal = document.createElement('div')
-        deleteModal.className = 'delete-modal'
-
-        const deleteModalQuestion = document.createElement('h3')
-        deleteModalQuestion.className = 'delete-modal__question'
-        deleteModalQuestion.textContent = 'Вы действительно хотите удалить эту задачу?'
-
-        const deleteModalButtons = document.createElement('div')
-        deleteModal.className = 'delete-modal__buttons'
-        const cancelButton = document.createElement('button')
-        cancelButton.className = 'delete-modal__button delete-modal__cancel-button'
-        cancelButton.textContent = 'Отмена'
-
-        const confirmButton = document.createElement('button')
-        confirmButton.className = 'delete-modal__confirm-button delete-modal__button'
-        confirmButton.textContent = 'Удалить'
-
-        deleteModalButtons.append(cancelButton, confirmButton)
-        deleteModal.append(deleteModalQuestion, deleteModalButtons)
-        modal.append(deleteModal)
-        document.body.append(modal)
-        modal.classList.remove('modal-overlay_hidden')
-    
-        cancelButton.addEventListener('click', () => {
-            modal.classList.add('modal-overlay_hidden')
-        })
-
-        confirmButton.addEventListener('click', () => {
-            const taskToDelete = document.querySelector(`[data-task-id="${button.dataset.deleteTaskId}"]`)
-
-            taskToDelete.remove()
-            modal.classList.add('modal-overlay_hidden')
-            const index = tasks.findIndex((obj) => {
-                return obj.id === button.dataset.deleteTaskId
-            })
-            delete tasks[index]
-        })
-}
-
-
-const allDeleteButtons = document.querySelectorAll('.task-item__delete-button')
-allDeleteButtons.forEach((deleteButton) => {
-    deleteButton.addEventListener('click', () => {
-        createDeleteModal(deleteButton)
-    })
-})
-
 createTaskBlock.append(createTaskInput, submitButton)
-document.body.prepend(createTaskBlock)
+body.prepend(createTaskBlock)
 
-
-document.addEventListener('keydown', (event) => {
-    if (event.key === ' ') {
-        darkMode = !darkMode
-        changeColor(darkMode)
-    }
-})
