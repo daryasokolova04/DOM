@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="index.css" />
+  <title>Работа с DOM</title>
+</head>
+<body>
+  <div class="task-item" data-task-id='1'>
+    <div class="task-item__main-container">
+      <div class="task-item__main-content">
+
+        <form class="checkbox-form">
+          <input type="checkbox" class="checkbox-form__checkbox" id="task-1">
+          <label for="task-1"></label>
+        </form>
+        <span class="task-item__text">Посмотреть урок по JavaScript</span>
+      </div>
+      <button class="task-item__delete-button default-button delete-button" data-delete-task-id='1'>удалить</button>
+
+    </div>
+  </div>
+  <script src="index.js"></script>
+</body>
+</html>
