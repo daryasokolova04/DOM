@@ -79,7 +79,7 @@ const createDeleteModal = (button) => {
     deleteModalQuestion.textContent = 'Вы действительно хотите удалить эту задачу?'
 
     const deleteModalButtons = document.createElement('div')
-    deleteModal.className = 'delete-modal__buttons'
+    deleteModalButtons.className = 'delete-modal__buttons'
     const cancelButton = document.createElement('button')
     cancelButton.className = 'delete-modal__button delete-modal__cancel-button'
     cancelButton.textContent = 'Отмена'
